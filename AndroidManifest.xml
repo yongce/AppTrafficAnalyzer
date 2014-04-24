@@ -8,8 +8,12 @@
         android:minSdkVersion="14"
         android:targetSdkVersion="19" />
 
+    <!-- SuperSu -->
+    <uses-permission android:name="android.permission.ACCESS_SUPERUSER" />
+
     <application
         android:theme="@android:style/Theme.Holo"
+        android:name="me.ycdev.android.trafficanalyzer.MyApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >

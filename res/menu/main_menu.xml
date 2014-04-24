@@ -4,7 +4,7 @@
         android:id="@+id/add"
         android:icon="@android:drawable/ic_menu_add"
         android:title="@string/action_add"
-        android:showAsAction="always" />
+        android:showAsAction="ifRoom" />
     <item
         android:id="@+id/clear"
         android:icon="@android:drawable/ic_menu_close_clear_cancel"
