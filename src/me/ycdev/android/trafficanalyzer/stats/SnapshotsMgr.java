@@ -71,6 +71,7 @@ public class SnapshotsMgr {
             String metaInfo = IoUtils.readAllLines(metaFile.getAbsolutePath());
             JSONArray rootJson = new JSONArray(metaInfo);
             final int N = rootJson.length();
+            mSnapshotsList.clear();
             for (int i = 0; i < N; i++) {
                 JSONObject itemJson = rootJson.getJSONObject(i);
                 SnapshotItem item = new SnapshotItem();
@@ -124,6 +125,7 @@ public class SnapshotsMgr {
         Shell.SU.run(cmds);
 
         loadMetaInfo();
+        // add the item even if loading failed
         mSnapshotsList.add(item);
         saveMetaInfo();
 
