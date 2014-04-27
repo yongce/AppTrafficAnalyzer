@@ -1,10 +1,10 @@
-package me.ycdev.android.trafficanalyzer.home;
+package me.ycdev.android.trafficanalyzer;
 
 import java.util.Collections;
 import java.util.List;
 
 import me.ycdev.android.trafficanalyzer.R;
-import me.ycdev.android.trafficanalyzer.stats.SnapshotItem;
+import me.ycdev.android.trafficanalyzer.stats.StatsSnapshot;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,19 +12,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class SnapshotsAdapter extends BaseAdapter {
     private Context mContext;
+    private ListView mListView;
     private LayoutInflater mInflater;
-    private List<SnapshotItem> mItems;
+    private List<StatsSnapshot> mItems;
 
-    public SnapshotsAdapter(Context cxt) {
+    public SnapshotsAdapter(Context cxt, ListView listView) {
         mContext = cxt;
+        mListView = listView;
         mInflater = LayoutInflater.from(mContext);
     }
 
-    public void setData(List<SnapshotItem> data) {
+    public void setData(List<StatsSnapshot> data) {
         mItems = data;
         Collections.sort(mItems);
         notifyDataSetChanged();
@@ -36,7 +39,7 @@ public class SnapshotsAdapter extends BaseAdapter {
     }
 
     @Override
-    public SnapshotItem getItem(int position) {
+    public StatsSnapshot getItem(int position) {
         return mItems.get(position);
     }
 
@@ -48,8 +51,9 @@ public class SnapshotsAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder = ViewHolder.get(mInflater, convertView, parent);
-        SnapshotItem item = getItem(position);
+        StatsSnapshot item = getItem(position);
 
+        holder.checkBox.setChecked(mListView.isItemChecked(position));
         holder.labelView.setText(mContext.getString(R.string.snapshot_label, item.fileName));
         holder.notesView.setText(mContext.getString(R.string.snapshot_notes, item.notes));
 
@@ -75,7 +79,7 @@ class ViewHolder {
             ViewGroup parent) {
         ViewHolder holder = null;
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.snapshot_item, parent, false);
+            convertView = inflater.inflate(R.layout.snapshots_item, parent, false);
             holder = new ViewHolder(convertView);
             convertView.setTag(holder);
         } else {

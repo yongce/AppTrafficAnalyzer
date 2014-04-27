@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import me.ycdev.android.trafficanalyzer.utils.AppLogger;
 import me.ycdev.androidlib.utils.DateTimeUtils;
@@ -19,8 +21,8 @@ import android.os.SystemClock;
 
 import eu.chainfire.libsuperuser.Shell;
 
-public class SnapshotsMgr {
-    private static final String TAG = "SnapshotsMgr";
+public class StatsSnapshotsMgr {
+    private static final String TAG = "StatsSnapshotsMgr";
     private static final boolean DEBUG = AppLogger.DEBUG;
 
     private static final String STATS_FILE = "/proc/net/xt_qtaguid/stats";
@@ -35,22 +37,22 @@ public class SnapshotsMgr {
 
     private Context mAppContext;
     private File mSnapsDir;
-    private List<SnapshotItem> mSnapshotsList = new ArrayList<SnapshotItem>();
+    private Set<StatsSnapshot> mAllSnapshots = new TreeSet<StatsSnapshot>();
     private boolean mMetaLoaded = false;
 
-    private static volatile SnapshotsMgr sInstance;
+    private static volatile StatsSnapshotsMgr sInstance;
 
-    private SnapshotsMgr(Context cxt) {
+    private StatsSnapshotsMgr(Context cxt) {
         mAppContext = cxt.getApplicationContext();
         mSnapsDir = mAppContext.getDir(SNAPSHOTS_DIR, Context.MODE_PRIVATE);
         loadMetaInfo();
     }
 
-    public static SnapshotsMgr getInstance(Context cxt) {
+    public static StatsSnapshotsMgr getInstance(Context cxt) {
         if (sInstance == null) {
-            synchronized (SnapshotsMgr.class) {
+            synchronized (StatsSnapshotsMgr.class) {
                 if (sInstance == null) {
-                    sInstance = new SnapshotsMgr(cxt);
+                    sInstance = new StatsSnapshotsMgr(cxt);
                 }
             }
         }
@@ -71,15 +73,15 @@ public class SnapshotsMgr {
             String metaInfo = IoUtils.readAllLines(metaFile.getAbsolutePath());
             JSONArray rootJson = new JSONArray(metaInfo);
             final int N = rootJson.length();
-            mSnapshotsList.clear();
+            mAllSnapshots.clear();
             for (int i = 0; i < N; i++) {
                 JSONObject itemJson = rootJson.getJSONObject(i);
-                SnapshotItem item = new SnapshotItem();
+                StatsSnapshot item = new StatsSnapshot();
                 item.createTime = itemJson.getLong(KEY_CREATE_TIME);
                 item.clockTime = itemJson.getLong(KEY_CLOCK_TIME);
                 item.fileName = itemJson.getString(KEY_FILE_NAME);
                 item.notes = itemJson.getString(KEY_NOTES);
-                mSnapshotsList.add(item);
+                mAllSnapshots.add(item);
             }
             mMetaLoaded = true;
         } catch (IOException e) {
@@ -92,7 +94,7 @@ public class SnapshotsMgr {
     private void saveMetaInfo() {
         try {
             JSONArray rootJson = new JSONArray();
-            for (SnapshotItem item : mSnapshotsList) {
+            for (StatsSnapshot item : mAllSnapshots) {
                 JSONObject itemJson = new JSONObject();
                 itemJson.put(KEY_CREATE_TIME, item.createTime);
                 itemJson.put(KEY_CLOCK_TIME, item.clockTime);
@@ -110,7 +112,7 @@ public class SnapshotsMgr {
     }
 
     public synchronized boolean createSnapshot(String notes) {
-        SnapshotItem item = new SnapshotItem();
+        StatsSnapshot item = new StatsSnapshot();
         item.createTime = System.currentTimeMillis();
         item.clockTime = SystemClock.elapsedRealtime();
         item.fileName = DateTimeUtils.generateFileName(item.createTime);
@@ -126,27 +128,38 @@ public class SnapshotsMgr {
 
         loadMetaInfo();
         // add the item even if loading failed
-        mSnapshotsList.add(item);
+        mAllSnapshots.add(item);
         saveMetaInfo();
 
         return true;
     }
 
     public synchronized void clearAllSnapshots() {
-        for (SnapshotItem item : mSnapshotsList) {
+        for (StatsSnapshot item : mAllSnapshots) {
             new File(mSnapsDir, item.fileName).delete();
         }
-        mSnapshotsList.clear();
+        mAllSnapshots.clear();
         saveMetaInfo();
+    }
+
+    public synchronized void deleteSnapshots(List<StatsSnapshot> deleteItems) {
+        mAllSnapshots.removeAll(deleteItems);
+        saveMetaInfo();
+        for (StatsSnapshot item : deleteItems) {
+            File snapFile = new File(mSnapsDir, item.fileName);
+            if (snapFile.exists()) {
+                snapFile.delete();
+            }
+        }
     }
 
     /**
      * Get all traffic stats snapshots.
      * @return Never be null.
      */
-    public synchronized List<SnapshotItem> getAllSnapshots() {
+    public synchronized List<StatsSnapshot> getAllSnapshots() {
         loadMetaInfo();
         // Just do a shadow clone
-        return new ArrayList<SnapshotItem>(mSnapshotsList);
+        return new ArrayList<StatsSnapshot>(mAllSnapshots);
     }
 }

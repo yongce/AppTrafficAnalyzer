@@ -4,12 +4,29 @@
 
     <string name="action_add">Add</string>
     <string name="action_clear">Clear</string>
+    <string name="action_diff">Diff</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_delete">Delete</string>
+
+    <string name="dlg_title_warning">Warning</string>
 
     <string name="tips_load_snapshot">Loading traffic stats snapshots&#8230;</string>
     <string name="tips_no_snapshot">No traffic stats snapshots saved.\nPlease try to snapshot traffic stats.</string>
     <string name="tips_create_snapshot">Creating traffic stats snapshot&#8230;</string>
     <string name="tips_clear_snapshots">Clearing all snapshots&#8230;</string>
+    <string name="tips_diff_item_count_error">Only two snapshots can be diffed!</string>
+    <string name="tips_delete_snapshots_confirm">You are requesting to delete %1$d snapshots.\n\nAre you sure to delete them?</string>
+    <string name="tips_load_data">Loading data&#8230;</string>
+    <string name="tips_computing_usage">Computing traffic usage&#8230;</string>
 
     <string name="snapshot_label">"Snapshot: %1$s"</string>
     <string name="snapshot_notes">"Notes: %1$s"</string>
+
+    <string name="usage_title">App Traffic Usage</string>
+    <string name="usage_snapshot_old">Old snapshot: %1$s</string>
+    <string name="usage_snapshot_new">New snapshot: %1$s</string>
+    <string name="fg_bg_choices_hint">Please choose fg/bg stats:</string>
+    <string name="fg_traffic">Foreground traffic</string>
+    <string name="bg_traffic">Background traffic</string>
+    <string name="iface_choices_hint">Please choose ifaces:</string>
 </resources>

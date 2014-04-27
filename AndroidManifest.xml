@@ -26,6 +26,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="me.ycdev.android.trafficanalyzer.AppTrafficUsageActivity"
+            android:label="@string/usage_title" />
     </application>
 
 </manifest>

@@ -1,6 +1,5 @@
 package me.ycdev.android.trafficanalyzer;
 
-import me.ycdev.android.trafficanalyzer.home.HomeFragment;
 
 import android.app.Activity;
 import android.app.FragmentManager;
@@ -20,7 +19,7 @@ public class LauncherActivity extends Activity {
         FragmentManager fragMgr = getFragmentManager();
         if (fragMgr.findFragmentByTag(FRAG_HOME) == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(R.id.container, new HomeFragment(), FRAG_HOME);
+            ft.add(R.id.container, new SnapshotsListFragment(), FRAG_HOME);
             ft.commit();
         }
     }
