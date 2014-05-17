@@ -29,7 +29,7 @@ public class SnapshotsAdapter extends BaseAdapter {
 
     public void setData(List<StatsSnapshot> data) {
         mItems = data;
-        Collections.sort(mItems);
+        Collections.sort(mItems, new StatsSnapshot.CreateTimeComparator());
         notifyDataSetChanged();
     }
 

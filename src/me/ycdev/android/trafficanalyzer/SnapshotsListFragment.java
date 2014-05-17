@@ -59,6 +59,8 @@ public class SnapshotsListFragment extends Fragment {
                     diffSnapshots();
                     return true;
                 case R.id.edit:
+                    // TODO
+                    Toast.makeText(getActivity(), "TODO", Toast.LENGTH_SHORT).show();
                     return true;
                 case R.id.delete:
                     deleteCheckedItems();
@@ -155,6 +157,26 @@ public class SnapshotsListFragment extends Fragment {
     }
 
     private void clearTrafficStatsSnapshots() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.dlg_title_warning);
+        builder.setMessage(R.string.tips_clear_snapshots_confirm);
+        builder.setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                doClearTrafficStatsSnapshots();
+            }
+        });
+        builder.setNegativeButton(R.string.btn_cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.create().show();
+    }
+
+    private void doClearTrafficStatsSnapshots() {
         new MyTask(getString(R.string.tips_clear_snapshots), new Runnable() {
             @Override
             public void run() {
@@ -171,8 +193,11 @@ public class SnapshotsListFragment extends Fragment {
         SparseBooleanArray checkedPositions = mListView.getCheckedItemPositions();
         StatsSnapshot oldSnapshot = mSnapshotItems.get(checkedPositions.keyAt(0));
         StatsSnapshot newSnapshot = mSnapshotItems.get(checkedPositions.keyAt(1));
-        AppProfile profile = AppProfilesMgr.getInstance(getActivity()).getProfile(10197); // TODO just for test
+        AppProfile profile = AppProfilesMgr.getInstance(getActivity()).getProfile(10115); // TODO just for test
         AppTrafficUsageActivity.showTrafficUsage(getActivity(), profile, oldSnapshot, newSnapshot);
+
+        mListView.clearChoices();
+        mActionMode.finish();
     }
 
     private void deleteCheckedItems() {
@@ -180,14 +205,14 @@ public class SnapshotsListFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.dlg_title_warning);
         builder.setMessage(msg);
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 doDeleteCheckedItems();
             }
         });
-        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.btn_cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();

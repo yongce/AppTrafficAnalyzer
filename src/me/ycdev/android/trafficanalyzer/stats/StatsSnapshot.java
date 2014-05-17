@@ -1,36 +1,41 @@
 package me.ycdev.android.trafficanalyzer.stats;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
-import android.os.Parcel;
-import android.os.Parcelable;
+import java.util.Comparator;
 
 import me.ycdev.android.trafficanalyzer.utils.AppLogger;
 import me.ycdev.android.trafficanalyzer.utils.ProcFileReader;
 import me.ycdev.androidlib.utils.IoUtils;
 
-public class StatsSnapshot implements Comparable<StatsSnapshot>, Parcelable {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class StatsSnapshot implements Parcelable {
     private static final String TAG = "StatsSnapshot";
     private static final boolean DEBUG = AppLogger.DEBUG;
 
+    public static class CreateTimeComparator implements Comparator<StatsSnapshot> {
+        @Override
+        public int compare(StatsSnapshot lhs, StatsSnapshot rhs) {
+            if (lhs.createTime > rhs.createTime) {
+                return 1;
+            } else if (lhs.createTime < rhs.createTime) {
+                return -1;
+            }
+            return 0;
+        }
+    }
+
     public long createTime;
     public long clockTime;
+    public String dirPath;
     public String fileName;
     public String notes;
 
     public StatsSnapshot() {
         // nothing to do
-    }
-
-    @Override
-    public int compareTo(StatsSnapshot another) {
-        if (createTime > another.createTime) {
-            return 1;
-        } else if (createTime < another.createTime) {
-            return -1;
-        }
-        return 0;
     }
 
     @Override
@@ -43,7 +48,8 @@ public class StatsSnapshot implements Comparable<StatsSnapshot>, Parcelable {
     }
 
     public UidTrafficStats parse(int uid) throws IOException, StatsParseException {
-        ProcFileReader reader = new ProcFileReader(new FileInputStream(fileName));
+        File snapFile = new File(dirPath, fileName);
+        ProcFileReader reader = new ProcFileReader(new FileInputStream(snapFile));
         UidTrafficStats uidStats = new UidTrafficStats();
         uidStats.uid = uid;
         try {
@@ -56,6 +62,7 @@ public class StatsSnapshot implements Comparable<StatsSnapshot>, Parcelable {
                 entry.tag = kernelToTag(reader.nextString());
                 int tagUid = reader.nextInt();
                 if (tagUid != uid) {
+                    reader.finishLine(); // consume left characters in this line
                     continue;
                 }
                 int set = reader.nextInt();
@@ -67,6 +74,7 @@ public class StatsSnapshot implements Comparable<StatsSnapshot>, Parcelable {
                 reader.nextLong(); // skip "rx_packets"
                 entry.sendBytes = reader.nextLong();
 
+                if (DEBUG) AppLogger.d(TAG, "parsed tag item: " + entry);
                 uidStats.addTagTrafficStats(entry.clone());
 
                 reader.finishLine(); // consume left characters in this line
@@ -119,6 +127,7 @@ public class StatsSnapshot implements Comparable<StatsSnapshot>, Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(createTime);
         dest.writeLong(clockTime);
+        dest.writeString(dirPath);
         dest.writeString(fileName);
         dest.writeString(notes);
     }
@@ -126,6 +135,7 @@ public class StatsSnapshot implements Comparable<StatsSnapshot>, Parcelable {
     private StatsSnapshot(Parcel in) {
         createTime = in.readLong();
         clockTime = in.readLong();
+        dirPath = in.readString();
         fileName = in.readString();
         notes = in.readString();
     }

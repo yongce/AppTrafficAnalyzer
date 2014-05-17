@@ -36,16 +36,17 @@ public class StatsSnapshotsMgr {
     private static final String KEY_NOTES = "notes";
 
     private Context mAppContext;
-    private File mSnapsDir;
-    private Set<StatsSnapshot> mAllSnapshots = new TreeSet<StatsSnapshot>();
+    private String mSnapsDir;
+    private Set<StatsSnapshot> mAllSnapshots;
     private boolean mMetaLoaded = false;
 
     private static volatile StatsSnapshotsMgr sInstance;
 
     private StatsSnapshotsMgr(Context cxt) {
         mAppContext = cxt.getApplicationContext();
-        mSnapsDir = mAppContext.getDir(SNAPSHOTS_DIR, Context.MODE_PRIVATE);
-        loadMetaInfo();
+        mSnapsDir = mAppContext.getDir(SNAPSHOTS_DIR, Context.MODE_PRIVATE).getAbsolutePath();
+        mAllSnapshots  = new TreeSet<StatsSnapshot>(new StatsSnapshot.CreateTimeComparator());
+        loadMetaInfoIfNeeded();
     }
 
     public static StatsSnapshotsMgr getInstance(Context cxt) {
@@ -59,7 +60,7 @@ public class StatsSnapshotsMgr {
         return sInstance;
     }
 
-    private void loadMetaInfo() {
+    private void loadMetaInfoIfNeeded() {
         if (mMetaLoaded) {
             return;
         }
@@ -73,12 +74,13 @@ public class StatsSnapshotsMgr {
             String metaInfo = IoUtils.readAllLines(metaFile.getAbsolutePath());
             JSONArray rootJson = new JSONArray(metaInfo);
             final int N = rootJson.length();
-            mAllSnapshots.clear();
+            mAllSnapshots.clear(); // for special case: an item added but loading failed
             for (int i = 0; i < N; i++) {
                 JSONObject itemJson = rootJson.getJSONObject(i);
                 StatsSnapshot item = new StatsSnapshot();
                 item.createTime = itemJson.getLong(KEY_CREATE_TIME);
                 item.clockTime = itemJson.getLong(KEY_CLOCK_TIME);
+                item.dirPath = mSnapsDir;
                 item.fileName = itemJson.getString(KEY_FILE_NAME);
                 item.notes = itemJson.getString(KEY_NOTES);
                 mAllSnapshots.add(item);
@@ -115,6 +117,7 @@ public class StatsSnapshotsMgr {
         StatsSnapshot item = new StatsSnapshot();
         item.createTime = System.currentTimeMillis();
         item.clockTime = SystemClock.elapsedRealtime();
+        item.dirPath = mSnapsDir;
         item.fileName = DateTimeUtils.generateFileName(item.createTime);
         item.notes = notes;
 
@@ -126,7 +129,7 @@ public class StatsSnapshotsMgr {
         };
         Shell.SU.run(cmds);
 
-        loadMetaInfo();
+        loadMetaInfoIfNeeded();
         // add the item even if loading failed
         mAllSnapshots.add(item);
         saveMetaInfo();
@@ -158,8 +161,12 @@ public class StatsSnapshotsMgr {
      * @return Never be null.
      */
     public synchronized List<StatsSnapshot> getAllSnapshots() {
-        loadMetaInfo();
+        loadMetaInfoIfNeeded();
         // Just do a shadow clone
         return new ArrayList<StatsSnapshot>(mAllSnapshots);
+    }
+
+    public File getSnapshotFile(StatsSnapshot item) {
+        return new File(mSnapsDir, item.fileName);
     }
 }

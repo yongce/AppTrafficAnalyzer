@@ -8,16 +8,21 @@
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
 
+    <string name="btn_ok">OK</string>
+    <string name="btn_cancel">Cancel</string>
+
     <string name="dlg_title_warning">Warning</string>
 
     <string name="tips_load_snapshot">Loading traffic stats snapshots&#8230;</string>
     <string name="tips_no_snapshot">No traffic stats snapshots saved.\nPlease try to snapshot traffic stats.</string>
     <string name="tips_create_snapshot">Creating traffic stats snapshot&#8230;</string>
+    <string name="tips_clear_snapshots_confirm">You are requesting to clear all snapshots.\n\nAre you sure to clear all?</string>
     <string name="tips_clear_snapshots">Clearing all snapshots&#8230;</string>
     <string name="tips_diff_item_count_error">Only two snapshots can be diffed!</string>
     <string name="tips_delete_snapshots_confirm">You are requesting to delete %1$d snapshots.\n\nAre you sure to delete them?</string>
     <string name="tips_load_data">Loading data&#8230;</string>
-    <string name="tips_computing_usage">Computing traffic usage&#8230;</string>
+    <string name="tips_computing_usage_ongoing">Computing traffic usage&#8230;</string>
+    <string name="tips_computing_usage_failed">Failed to compute traffic usage</string>
 
     <string name="snapshot_label">"Snapshot: %1$s"</string>
     <string name="snapshot_notes">"Notes: %1$s"</string>
