@@ -69,8 +69,14 @@
         android:layout_marginTop="8dp"
         android:background="@android:color/holo_blue_bright" />
 
-    <TableLayout
+    <ListView
         android:id="@+id/tags_stats"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+    <TextView
+        android:id="@+id/empty_no_usage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/tips_no_traffic_usage" />
 </LinearLayout>

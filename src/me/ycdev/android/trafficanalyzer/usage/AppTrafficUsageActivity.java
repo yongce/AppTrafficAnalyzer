@@ -1,11 +1,15 @@
-package me.ycdev.android.trafficanalyzer;
+package me.ycdev.android.trafficanalyzer.usage;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 import me.ycdev.android.trafficanalyzer.R;
 import me.ycdev.android.trafficanalyzer.profile.AppProfile;
 import me.ycdev.android.trafficanalyzer.stats.StatsParseException;
 import me.ycdev.android.trafficanalyzer.stats.StatsSnapshot;
+import me.ycdev.android.trafficanalyzer.stats.TagTrafficStats;
 import me.ycdev.android.trafficanalyzer.stats.UidTrafficStats;
 import me.ycdev.android.trafficanalyzer.utils.AppLogger;
 import me.ycdev.androidlib.base.WeakHandler;
@@ -17,13 +21,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.LayoutInflater;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.GridView;
-import android.widget.TableLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class AppTrafficUsageActivity extends Activity implements WeakHandler.MessageHandler {
+public class AppTrafficUsageActivity extends Activity implements WeakHandler.MessageHandler,
+        CompoundButton.OnCheckedChangeListener {
     private static final boolean DEBUG = AppLogger.DEBUG;
     private static final String TAG = "AppTrafficUsageActivity";
 
@@ -39,10 +46,12 @@ public class AppTrafficUsageActivity extends Activity implements WeakHandler.Mes
     private UidTrafficStats mNewUidStats;
     private UidTrafficStats mUidUsage;
 
+    private LayoutInflater mInflater;
     private CheckBox mFgTrafficCheckBox;
     private CheckBox mBgTrafficCheckBox;
     private GridView mIfaceChoicesView;
-    private TableLayout mTagsStatsView;
+    private ListView mTagsStatsView;
+    private TrafficUsageAdapter mAdapter;
 
     private Handler mHandler = new WeakHandler(this);
 
@@ -71,7 +80,8 @@ public class AppTrafficUsageActivity extends Activity implements WeakHandler.Mes
     }
 
     private void initViews() {
-        setContentView(R.layout.app_traffic_usage);
+        setContentView(R.layout.usage_main);
+        mInflater = LayoutInflater.from(this);
 
         TextView snap1View = (TextView) findViewById(R.id.snapshot_old);
         snap1View.setText(getString(R.string.usage_snapshot_old, mOldSnapshot.fileName));
@@ -80,12 +90,18 @@ public class AppTrafficUsageActivity extends Activity implements WeakHandler.Mes
 
         mFgTrafficCheckBox = (CheckBox) findViewById(R.id.fg_traffic);
         mFgTrafficCheckBox.setChecked(true);
+        mFgTrafficCheckBox.setOnCheckedChangeListener(this);
         mBgTrafficCheckBox = (CheckBox) findViewById(R.id.bg_traffic);
         mBgTrafficCheckBox.setChecked(true);
+        mBgTrafficCheckBox.setOnCheckedChangeListener(this);
 
         mIfaceChoicesView = (GridView) findViewById(R.id.iface_choices);
 
-        mTagsStatsView = (TableLayout) findViewById(R.id.tags_stats);
+        mTagsStatsView = (ListView) findViewById(R.id.tags_stats);
+        mTagsStatsView.setEmptyView(findViewById(R.id.empty_no_usage));
+        TrafficUsageAdapter.addHeaderView(mInflater, mTagsStatsView);
+        mAdapter = new TrafficUsageAdapter(mInflater);
+        mTagsStatsView.setAdapter(mAdapter);
     }
 
     private void loadData() {
@@ -130,14 +146,42 @@ public class AppTrafficUsageActivity extends Activity implements WeakHandler.Mes
                                     Toast.LENGTH_LONG).show();
                         }
                     });
+                } else {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            computeTrafficUsage();
+                        }
+                    });
                 }
                 dlg.dismiss();
             }
         }.start();
     }
 
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        computeTrafficUsage();
+    }
+
     private void computeTrafficUsage() {
-        
+        boolean fgSelected = mFgTrafficCheckBox.isChecked();
+        boolean bgSelected = mBgTrafficCheckBox.isChecked();
+        HashSet<String> ifacesSelected = new HashSet<String>();
+        // TODO check ifaces
+
+        List<TagTrafficStats> allTagsUsage = mUidUsage.getAllTagsStats();
+        List<TagTrafficStats> filteredUsage = new ArrayList<TagTrafficStats>(allTagsUsage.size());
+        for (TagTrafficStats item : allTagsUsage) {
+            // TODO check ifaces
+            if (fgSelected && item.foreground) {
+                filteredUsage.add(item);
+            } else if (bgSelected && !item.foreground) {
+                filteredUsage.add(item);
+            }
+        }
+
+        mAdapter.setData(filteredUsage);
     }
 
     public static void showTrafficUsage(Context cxt, AppProfile appProfile,

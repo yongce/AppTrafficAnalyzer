@@ -8,6 +8,7 @@ import me.ycdev.android.trafficanalyzer.profile.AppProfile;
 import me.ycdev.android.trafficanalyzer.profile.AppProfilesMgr;
 import me.ycdev.android.trafficanalyzer.stats.StatsSnapshot;
 import me.ycdev.android.trafficanalyzer.stats.StatsSnapshotsMgr;
+import me.ycdev.android.trafficanalyzer.usage.AppTrafficUsageActivity;
 import me.ycdev.android.trafficanalyzer.utils.AppLogger;
 
 import android.app.AlertDialog;

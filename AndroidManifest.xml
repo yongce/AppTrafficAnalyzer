@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="me.ycdev.android.trafficanalyzer.AppTrafficUsageActivity"
+            android:name="me.ycdev.android.trafficanalyzer.usage.AppTrafficUsageActivity"
             android:label="@string/usage_title" />
     </application>
 

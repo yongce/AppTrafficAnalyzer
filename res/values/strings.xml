@@ -23,6 +23,7 @@
     <string name="tips_load_data">Loading data&#8230;</string>
     <string name="tips_computing_usage_ongoing">Computing traffic usage&#8230;</string>
     <string name="tips_computing_usage_failed">Failed to compute traffic usage</string>
+    <string name="tips_no_traffic_usage">No traffic usage</string>
 
     <string name="snapshot_label">"Snapshot: %1$s"</string>
     <string name="snapshot_notes">"Notes: %1$s"</string>
@@ -34,4 +35,9 @@
     <string name="fg_traffic">Foreground traffic</string>
     <string name="bg_traffic">Background traffic</string>
     <string name="iface_choices_hint">Please choose ifaces:</string>
+    <string name="usage_traffic_column_iface">Iface</string>
+    <string name="usage_traffic_column_tag">Tag</string>
+    <string name="usage_traffic_column_fg">Fg</string>
+    <string name="usage_traffic_column_send">Sended</string>
+    <string name="usage_traffic_column_recv">Received</string>
 </resources>
