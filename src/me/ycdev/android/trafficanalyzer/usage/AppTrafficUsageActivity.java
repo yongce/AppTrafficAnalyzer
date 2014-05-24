@@ -89,6 +89,8 @@ public class AppTrafficUsageActivity extends Activity implements WeakHandler.Mes
             return;
         }
 
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+
         initViews();
         loadData();
     }

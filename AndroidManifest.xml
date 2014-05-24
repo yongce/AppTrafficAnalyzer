@@ -28,7 +28,13 @@
         </activity>
         <activity
             android:name="me.ycdev.android.trafficanalyzer.usage.AppTrafficUsageActivity"
-            android:label="@string/usage_title" />
+            android:label="@string/usage_title"
+            android:parentActivityName="me.ycdev.android.trafficanalyzer.LauncherActivity" >
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="me.ycdev.android.trafficanalyzer.LauncherActivity" />
+        </activity>
     </application>
 
 </manifest>
