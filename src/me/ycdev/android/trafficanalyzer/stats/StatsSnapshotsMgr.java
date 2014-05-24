@@ -145,6 +145,10 @@ public class StatsSnapshotsMgr {
         saveMetaInfo();
     }
 
+    public synchronized void updateSnapshotNotes(StatsSnapshot item) {
+        saveMetaInfo();
+    }
+
     public synchronized void deleteSnapshots(List<StatsSnapshot> deleteItems) {
         mAllSnapshots.removeAll(deleteItems);
         saveMetaInfo();

@@ -3,7 +3,6 @@ package me.ycdev.android.trafficanalyzer;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.ycdev.android.trafficanalyzer.R;
 import me.ycdev.android.trafficanalyzer.profile.AppProfile;
 import me.ycdev.android.trafficanalyzer.profile.AppProfilesMgr;
 import me.ycdev.android.trafficanalyzer.stats.StatsSnapshot;
@@ -25,7 +24,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AbsListView.MultiChoiceModeListener;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -60,8 +61,7 @@ public class SnapshotsListFragment extends Fragment {
                     diffSnapshots();
                     return true;
                 case R.id.edit:
-                    // TODO
-                    Toast.makeText(getActivity(), "TODO", Toast.LENGTH_SHORT).show();
+                    editNotes();
                     return true;
                 case R.id.delete:
                     deleteCheckedItems();
@@ -186,19 +186,75 @@ public class SnapshotsListFragment extends Fragment {
         }).execute();
     }
 
+    private List<StatsSnapshot> getCheckedItems() {
+        List<StatsSnapshot> results = new ArrayList<StatsSnapshot>();
+        SparseBooleanArray checkedPositions = mListView.getCheckedItemPositions();
+        for (int pos = 0; pos < mAdapter.getCount(); pos++) {
+            if (checkedPositions.get(pos)) {
+                results.add(mSnapshotItems.get(pos));
+            }
+        }
+        return results;
+    }
+
     private void diffSnapshots() {
         if (mListView.getCheckedItemCount() != 2) {
             Toast.makeText(getActivity(), R.string.tips_diff_item_count_error, Toast.LENGTH_LONG).show();
             return;
         }
-        SparseBooleanArray checkedPositions = mListView.getCheckedItemPositions();
-        StatsSnapshot oldSnapshot = mSnapshotItems.get(checkedPositions.keyAt(0));
-        StatsSnapshot newSnapshot = mSnapshotItems.get(checkedPositions.keyAt(1));
+        List<StatsSnapshot> checkedItems = getCheckedItems();
+        StatsSnapshot oldSnapshot = checkedItems.get(0);
+        StatsSnapshot newSnapshot = checkedItems.get(1);
         AppProfile profile = AppProfilesMgr.getInstance(getActivity()).getProfile(10115); // TODO just for test
         AppTrafficUsageActivity.showTrafficUsage(getActivity(), profile, oldSnapshot, newSnapshot);
 
         mListView.clearChoices();
         mActionMode.finish();
+    }
+
+    private void editNotes() {
+        if (mListView.getCheckedItemCount() != 1) {
+            Toast.makeText(getActivity(), R.string.tips_edit_item_count_error, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        List<StatsSnapshot> checkedItems = getCheckedItems();
+        final StatsSnapshot snapshot = checkedItems.get(0);
+
+        View contentView = getActivity().getLayoutInflater().inflate(
+                R.layout.snapshot_note_editor, null);
+        final EditText editView = (EditText) contentView.findViewById(R.id.notes);
+        editView.setText(snapshot.notes);
+        editView.setSelectAllOnFocus(true);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.dlg_title_edit);
+        builder.setView(contentView);
+        builder.setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                snapshot.notes = editView.getText().toString();
+                saveSnapshotNotes(snapshot);
+                dialog.dismiss();
+            }
+        });
+        builder.setNegativeButton(R.string.btn_cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog dlg = builder.create();
+        dlg.getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        dlg.show();
+    }
+
+    private void saveSnapshotNotes(StatsSnapshot snapshot) {
+        StatsSnapshotsMgr.getInstance(getActivity()).updateSnapshotNotes(snapshot);
+        mSnapshotItems = StatsSnapshotsMgr.getInstance(getActivity()).getAllSnapshots();
+        mAdapter.setData(mSnapshotItems);
     }
 
     private void deleteCheckedItems() {
