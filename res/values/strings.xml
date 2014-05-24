@@ -7,11 +7,13 @@
     <string name="action_diff">Diff</string>
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
+    <string name="action_export">Export</string>
 
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Cancel</string>
 
     <string name="dlg_title_warning">Warning</string>
+    <string name="dlg_title_hint">Hint</string>
 
     <string name="tips_load_snapshot">Loading traffic stats snapshots&#8230;</string>
     <string name="tips_no_snapshot">No traffic stats snapshots saved.\nPlease try to snapshot traffic stats.</string>
@@ -24,6 +26,10 @@
     <string name="tips_computing_usage_ongoing">Computing traffic usage&#8230;</string>
     <string name="tips_computing_usage_failed">Failed to compute traffic usage</string>
     <string name="tips_no_traffic_usage">No traffic usage</string>
+    <string name="tips_usage_export_no_data">No traffic usage to export</string>
+    <string name="tips_usage_exporting">Exporting traffic usage&#8230;</string>
+    <string name="tips_usage_export_success">Succeeded to export traffic usage to the file \'%1$s\'.</string>
+    <string name="tips_usage_export_failure">Failed to export traffic usage.</string>
 
     <string name="snapshot_label">"Snapshot: %1$s"</string>
     <string name="snapshot_notes">"Notes: %1$s"</string>
@@ -38,6 +44,7 @@
     <string name="usage_traffic_column_iface">Iface</string>
     <string name="usage_traffic_column_tag">Tag</string>
     <string name="usage_traffic_column_fg">Fg</string>
-    <string name="usage_traffic_column_send">Sended</string>
-    <string name="usage_traffic_column_recv">Received</string>
+    <string name="usage_traffic_column_send">Send</string>
+    <string name="usage_traffic_column_recv">Recv</string>
+    <string name="usage_traffic_column_total">Total</string>
 </resources>

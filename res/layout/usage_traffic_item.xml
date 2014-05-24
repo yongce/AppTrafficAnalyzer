@@ -7,13 +7,13 @@
         android:id="@+id/iface"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minWidth="50dp"
+        android:minWidth="60dp"
         android:layout_marginLeft="10dp" />
     <TextView
         android:id="@+id/tag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minWidth="80dp"
+        android:minWidth="50dp"
         android:layout_marginLeft="10dp" />
     <TextView
         android:id="@+id/fg"
@@ -25,10 +25,16 @@
         android:id="@+id/send"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minWidth="60dp"
+        android:minWidth="50dp"
         android:layout_marginLeft="10dp" />
     <TextView
         android:id="@+id/recv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="50dp"
+        android:layout_marginLeft="10dp" />
+    <TextView
+        android:id="@+id/total"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp" />

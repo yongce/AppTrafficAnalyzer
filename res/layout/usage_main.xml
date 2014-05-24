@@ -61,7 +61,9 @@
         android:id="@+id/iface_choices"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:columnWidth="100dp" />
+        android:layout_marginLeft="8dp"
+        android:columnWidth="80dp"
+        android:numColumns="auto_fit" />
 
     <View
         android:layout_width="match_parent"

@@ -1,9 +1,14 @@
 package me.ycdev.android.trafficanalyzer.usage;
 
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import me.ycdev.android.trafficanalyzer.R;
 import me.ycdev.android.trafficanalyzer.profile.AppProfile;
@@ -13,24 +18,32 @@ import me.ycdev.android.trafficanalyzer.stats.TagTrafficStats;
 import me.ycdev.android.trafficanalyzer.stats.UidTrafficStats;
 import me.ycdev.android.trafficanalyzer.utils.AppLogger;
 import me.ycdev.androidlib.base.WeakHandler;
+import me.ycdev.androidlib.utils.DateTimeUtils;
+import me.ycdev.androidlib.utils.IoUtils;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class AppTrafficUsageActivity extends Activity implements WeakHandler.MessageHandler,
-        CompoundButton.OnCheckedChangeListener {
+        OnCheckedChangeListener {
     private static final boolean DEBUG = AppLogger.DEBUG;
     private static final String TAG = "AppTrafficUsageActivity";
 
@@ -50,8 +63,9 @@ public class AppTrafficUsageActivity extends Activity implements WeakHandler.Mes
     private CheckBox mFgTrafficCheckBox;
     private CheckBox mBgTrafficCheckBox;
     private GridView mIfaceChoicesView;
+    private TrafficIfacesAdapter mIfacesAdapter;
     private ListView mTagsStatsView;
-    private TrafficUsageAdapter mAdapter;
+    private TrafficUsageAdapter mUsageAdapter;
 
     private Handler mHandler = new WeakHandler(this);
 
@@ -96,12 +110,14 @@ public class AppTrafficUsageActivity extends Activity implements WeakHandler.Mes
         mBgTrafficCheckBox.setOnCheckedChangeListener(this);
 
         mIfaceChoicesView = (GridView) findViewById(R.id.iface_choices);
+        mIfacesAdapter = new TrafficIfacesAdapter(mInflater, this);
+        mIfaceChoicesView.setAdapter(mIfacesAdapter);
 
         mTagsStatsView = (ListView) findViewById(R.id.tags_stats);
         mTagsStatsView.setEmptyView(findViewById(R.id.empty_no_usage));
         TrafficUsageAdapter.addHeaderView(mInflater, mTagsStatsView);
-        mAdapter = new TrafficUsageAdapter(mInflater);
-        mTagsStatsView.setAdapter(mAdapter);
+        mUsageAdapter = new TrafficUsageAdapter(mInflater);
+        mTagsStatsView.setAdapter(mUsageAdapter);
     }
 
     private void loadData() {
@@ -147,9 +163,20 @@ public class AppTrafficUsageActivity extends Activity implements WeakHandler.Mes
                         }
                     });
                 } else {
+                    HashSet<String> uncheckedIfaces = new HashSet<String>();
+                    uncheckedIfaces.add("lo");
+
+                    List<String> ifaces = mUidUsage.getAllIfaces();
+                    final List<TrafficIfaceItem> data = new ArrayList<TrafficIfaceItem>();
+                    for (String iface : ifaces) {
+                        boolean checked = !uncheckedIfaces.contains(iface);
+                        data.add(new TrafficIfaceItem(iface, checked));
+                    }
+
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                            mIfacesAdapter.setData(data);
                             computeTrafficUsage();
                         }
                     });
@@ -167,21 +194,133 @@ public class AppTrafficUsageActivity extends Activity implements WeakHandler.Mes
     private void computeTrafficUsage() {
         boolean fgSelected = mFgTrafficCheckBox.isChecked();
         boolean bgSelected = mBgTrafficCheckBox.isChecked();
-        HashSet<String> ifacesSelected = new HashSet<String>();
-        // TODO check ifaces
+        Set<String> ifacesSelected = mIfacesAdapter.getSelectedIfaces();
 
         List<TagTrafficStats> allTagsUsage = mUidUsage.getAllTagsStats();
-        List<TagTrafficStats> filteredUsage = new ArrayList<TagTrafficStats>(allTagsUsage.size());
+        List<TrafficUsageItem> filteredUsage = new ArrayList<TrafficUsageItem>(allTagsUsage.size());
+        TagTrafficStats totalItem = new TagTrafficStats();
+        totalItem.iface = "*";
+
         for (TagTrafficStats item : allTagsUsage) {
-            // TODO check ifaces
-            if (fgSelected && item.foreground) {
-                filteredUsage.add(item);
-            } else if (bgSelected && !item.foreground) {
-                filteredUsage.add(item);
+            if (item.foreground && !fgSelected) {
+                continue;
             }
+            if (!item.foreground && !bgSelected) {
+                continue;
+            }
+            if (!ifacesSelected.contains(item.iface)) {
+                continue;
+            }
+            filteredUsage.add(new TrafficUsageItem(item, false));
+            totalItem.sendBytes += item.sendBytes;
+            totalItem.recvBytes += item.recvBytes;
         }
 
-        mAdapter.setData(filteredUsage);
+        if (filteredUsage.size() > 0) {
+            filteredUsage.add(new TrafficUsageItem(totalItem, true));
+        }
+
+        mUsageAdapter.setData(filteredUsage);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.traffic_usage_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.export) {
+            exportTrafficUsage();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void exportTrafficUsage() {
+        final List<TrafficUsageItem> trafficUsageItems = mUsageAdapter.getData();
+        if (trafficUsageItems == null || trafficUsageItems.size() == 0) {
+            Toast.makeText(this, R.string.tips_usage_export_no_data, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        final ProgressDialog dlg = new ProgressDialog(this);
+        dlg.setMessage(getString(R.string.tips_usage_exporting));
+        dlg.setCancelable(false);
+        dlg.show();
+
+        final Context context = getApplicationContext();
+        new Thread() {
+            @Override
+            public void run() {
+                final String fileName = "usage-" + DateTimeUtils.generateFileName(System.currentTimeMillis());
+                FileOutputStream fos = null;
+                final boolean[] success = new boolean[] { false };
+                try {
+                    fos = context.openFileOutput(fileName, Context.MODE_PRIVATE);
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos));
+                    // write header line
+                    writer.append(getString(R.string.usage_traffic_column_iface))
+                            .append('\t').append(getString(R.string.usage_traffic_column_tag))
+                            .append('\t').append(getString(R.string.usage_traffic_column_fg))
+                            .append('\t').append(getString(R.string.usage_traffic_column_send))
+                            .append('\t').append(getString(R.string.usage_traffic_column_recv))
+                            .append('\t').append(getString(R.string.usage_traffic_column_total))
+                            .append('\n');
+                    // write all data lines
+                    for (TrafficUsageItem item : trafficUsageItems) {
+                        if (item.isTotal) {
+                            writer.append("*\t*\t*");
+                        } else {
+                            writer.append(item.usage.iface)
+                                    .append('\t').append("0x" + Integer.toHexString(item.usage.tag))
+                                    .append('\t').append(item.usage.foreground ? "Y" : "N");
+                        }
+                        writer.append("\t").append(String.valueOf(item.usage.sendBytes))
+                                .append('\t').append(String.valueOf(item.usage.recvBytes))
+                                .append('\t').append(String.valueOf(item.usage.sendBytes + item.usage.recvBytes))
+                                .append('\n');
+                    }
+                    writer.flush();
+                    success[0] = true;
+                } catch (FileNotFoundException e) {
+                    AppLogger.w(TAG, "failed to export traffic usage", e);
+                } catch (IOException e) {
+                    AppLogger.w(TAG, "failed to export traffic usage", e);
+                } finally {
+                    IoUtils.closeQuietly(fos);
+                }
+
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        showExportFinishDialog(success[0],
+                                context.getFileStreamPath(fileName).getAbsolutePath());
+                    }
+                });
+                dlg.dismiss();
+            }
+        }.start();
+    }
+
+    private void showExportFinishDialog(boolean success, String filePath) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        if (success) {
+            builder.setTitle(R.string.dlg_title_hint);
+            builder.setMessage(getString(R.string.tips_usage_export_success, filePath));
+        } else {
+            builder.setTitle(R.string.dlg_title_warning);
+            builder.setMessage(R.string.tips_usage_export_failure);
+        }
+        builder.setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.create().show();
     }
 
     public static void showTrafficUsage(Context cxt, AppProfile appProfile,
