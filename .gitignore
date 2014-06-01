@@ -25,3 +25,8 @@ proguard/
 # Eclipse project files
 .classpath
 .project
+
+# Android Studio files
+.idea/
+*.iml
+

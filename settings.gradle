@@ -1,0 +1,3 @@
+include ':'
+include ':submodules:libsuperuser:libsuperuser'
+include ':submodules:AndroidLib'
