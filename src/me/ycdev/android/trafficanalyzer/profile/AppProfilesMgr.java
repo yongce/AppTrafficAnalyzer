@@ -28,7 +28,7 @@ public class AppProfilesMgr {
         return null; // TODO
     }
 
-    public AppProfile getProfile(int uid) {
-        return new AppProfile(uid); // TODO
+    public AppProfile getCurProfile() {
+        return new AppProfile("me.ycdev.android.trafficanalyzer", 10101, "Traffic Analyzer");
     }
 }

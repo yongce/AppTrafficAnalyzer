@@ -3,18 +3,18 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.11.+'
+        classpath 'com.android.tools.build:gradle:0.12.+'
     }
 }
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 19
     buildToolsVersion "19.1.0"
 
     defaultConfig {
-        packageName "me.ycdev.android.trafficanalyzer"
-        minSdkVersion 14
+        applicationId "me.ycdev.android.trafficanalyzer"
+        minSdkVersion 15
         targetSdkVersion 19
     }
 

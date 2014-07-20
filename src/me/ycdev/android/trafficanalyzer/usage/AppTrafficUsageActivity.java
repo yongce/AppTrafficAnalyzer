@@ -21,6 +21,7 @@ import me.ycdev.androidlib.base.WeakHandler;
 import me.ycdev.androidlib.utils.DateTimeUtils;
 import me.ycdev.androidlib.utils.IoUtils;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -328,7 +329,7 @@ public class AppTrafficUsageActivity extends Activity implements WeakHandler.Mes
     public static void showTrafficUsage(Context cxt, AppProfile appProfile,
             StatsSnapshot oldSnapshot, StatsSnapshot newSnapshot) {
         Intent intent = new Intent(cxt, AppTrafficUsageActivity.class);
-        intent.putExtra(EXTRA_UID, appProfile.getAppUid());
+        intent.putExtra(EXTRA_UID, appProfile.getRealAppUid(cxt));
         intent.putExtra(EXTRA_OLD_SNAPSHOT, oldSnapshot);
         intent.putExtra(EXTRA_NEW_SNAPSHOT, newSnapshot);
         cxt.startActivity(intent);

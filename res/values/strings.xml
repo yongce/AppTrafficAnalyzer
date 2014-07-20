@@ -2,6 +2,11 @@
 <resources>
     <string name="app_name">TrafficAnalyzer</string>
 
+    <!-- Description of the icon that opens the navigation drawer, used by accessibility. -->
+    <string name="drawer_open">Open navigation drawer</string>
+    <!-- Description of the icon that closes the navigation drawer, used by accessibility. -->
+    <string name="drawer_close">Close navigation drawer</string>
+
     <string name="action_add">Add</string>
     <string name="action_clear">Clear</string>
     <string name="action_diff">Diff</string>
