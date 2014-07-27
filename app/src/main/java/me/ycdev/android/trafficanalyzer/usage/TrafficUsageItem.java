@@ -1,6 +1,6 @@
 package me.ycdev.android.trafficanalyzer.usage;
 
-import me.ycdev.android.trafficanalyzer.stats.TagTrafficStats;
+import me.ycdev.android.trafficanalyzer.snaps.TagTrafficStats;
 
 public class TrafficUsageItem {
     public TagTrafficStats usage;

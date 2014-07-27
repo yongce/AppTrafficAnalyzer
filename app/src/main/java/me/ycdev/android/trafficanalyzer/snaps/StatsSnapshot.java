@@ -1,4 +1,4 @@
-package me.ycdev.android.trafficanalyzer.stats;
+package me.ycdev.android.trafficanalyzer.snaps;
 
 import java.io.File;
 import java.io.FileInputStream;

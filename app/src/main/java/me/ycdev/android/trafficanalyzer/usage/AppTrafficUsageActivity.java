@@ -12,16 +12,15 @@ import java.util.Set;
 
 import me.ycdev.android.trafficanalyzer.R;
 import me.ycdev.android.trafficanalyzer.profile.AppProfile;
-import me.ycdev.android.trafficanalyzer.stats.StatsParseException;
-import me.ycdev.android.trafficanalyzer.stats.StatsSnapshot;
-import me.ycdev.android.trafficanalyzer.stats.TagTrafficStats;
-import me.ycdev.android.trafficanalyzer.stats.UidTrafficStats;
+import me.ycdev.android.trafficanalyzer.snaps.StatsParseException;
+import me.ycdev.android.trafficanalyzer.snaps.StatsSnapshot;
+import me.ycdev.android.trafficanalyzer.snaps.TagTrafficStats;
+import me.ycdev.android.trafficanalyzer.snaps.UidTrafficStats;
 import me.ycdev.android.trafficanalyzer.utils.AppLogger;
 import me.ycdev.androidlib.base.WeakHandler;
 import me.ycdev.androidlib.utils.DateTimeUtils;
 import me.ycdev.androidlib.utils.IoUtils;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;

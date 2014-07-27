@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">TrafficAnalyzer</string>
+    <string name="app_name">Traffic Analyzer</string>
 
     <!-- Description of the icon that opens the navigation drawer, used by accessibility. -->
     <string name="drawer_open">Open navigation drawer</string>
     <!-- Description of the icon that closes the navigation drawer, used by accessibility. -->
     <string name="drawer_close">Close navigation drawer</string>
+    <string name="drawer_snapshots">Traffic Stats Snapshots</string>
+    <string name="drawer_profiles">Apps Profiles</string>
 
     <string name="action_add">Add</string>
     <string name="action_clear">Clear</string>
@@ -21,20 +23,20 @@
     <string name="dlg_title_hint">Hint</string>
     <string name="dlg_title_edit">Edit</string>
 
-    <string name="tips_load_snapshot">Loading traffic stats snapshots&#8230;</string>
+    <string name="tips_load_snapshot">Loading traffic stats snapshots…</string>
     <string name="tips_no_snapshot">No traffic stats snapshots saved.\nPlease try to snapshot traffic stats.</string>
-    <string name="tips_create_snapshot">Creating traffic stats snapshot&#8230;</string>
+    <string name="tips_create_snapshot">Creating traffic stats snapshot…</string>
     <string name="tips_clear_snapshots_confirm">You are requesting to clear all snapshots.\n\nAre you sure to clear all?</string>
-    <string name="tips_clear_snapshots">Clearing all snapshots&#8230;</string>
+    <string name="tips_clear_snapshots">Clearing all snapshots…</string>
     <string name="tips_diff_item_count_error">Only two snapshots can be diffed!</string>
     <string name="tips_edit_item_count_error">Only one snapshot can be edited!</string>
     <string name="tips_delete_snapshots_confirm">You are requesting to delete %1$d snapshots.\n\nAre you sure to delete them?</string>
-    <string name="tips_load_data">Loading data&#8230;</string>
-    <string name="tips_computing_usage_ongoing">Computing traffic usage&#8230;</string>
+    <string name="tips_load_data">Loading data…</string>
+    <string name="tips_computing_usage_ongoing">Computing traffic usage…</string>
     <string name="tips_computing_usage_failed">Failed to compute traffic usage</string>
     <string name="tips_no_traffic_usage">No traffic usage</string>
     <string name="tips_usage_export_no_data">No traffic usage to export</string>
-    <string name="tips_usage_exporting">Exporting traffic usage&#8230;</string>
+    <string name="tips_usage_exporting">Exporting traffic usage…</string>
     <string name="tips_usage_export_success">Succeeded to export traffic usage to the file \'%1$s\'.</string>
     <string name="tips_usage_export_failure">Failed to export traffic usage.</string>
 
@@ -55,4 +57,6 @@
     <string name="usage_traffic_column_send">Send</string>
     <string name="usage_traffic_column_recv">Recv</string>
     <string name="usage_traffic_column_total">Total</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

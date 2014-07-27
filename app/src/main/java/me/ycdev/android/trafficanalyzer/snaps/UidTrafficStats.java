@@ -1,4 +1,4 @@
-package me.ycdev.android.trafficanalyzer.stats;
+package me.ycdev.android.trafficanalyzer.snaps;
 
 import java.util.ArrayList;
 import java.util.List;

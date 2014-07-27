@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="drawer_bkg">#333</color>
+    <color name="drawer_divider_line">#aaa</color>
+    <color name="drawer_item_pressed">#666</color>
+</resources>

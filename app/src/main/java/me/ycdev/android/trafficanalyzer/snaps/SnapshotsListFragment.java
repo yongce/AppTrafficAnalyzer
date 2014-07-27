@@ -1,24 +1,11 @@
-package me.ycdev.android.trafficanalyzer;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import me.ycdev.android.trafficanalyzer.profile.AppProfile;
-import me.ycdev.android.trafficanalyzer.profile.AppProfilesMgr;
-import me.ycdev.android.trafficanalyzer.stats.StatsSnapshot;
-import me.ycdev.android.trafficanalyzer.stats.StatsSnapshotsMgr;
-import me.ycdev.android.trafficanalyzer.usage.AppTrafficUsageActivity;
-import me.ycdev.android.trafficanalyzer.utils.AppLogger;
+package me.ycdev.android.trafficanalyzer.snaps;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.widget.DrawerLayout;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -33,12 +20,18 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import me.ycdev.android.trafficanalyzer.R;
+import me.ycdev.android.trafficanalyzer.profile.AppProfile;
+import me.ycdev.android.trafficanalyzer.profile.AppProfilesMgr;
+import me.ycdev.android.trafficanalyzer.usage.AppTrafficUsageActivity;
+import me.ycdev.android.trafficanalyzer.utils.AppLogger;
+
 public class SnapshotsListFragment extends Fragment {
     private static final String TAG = "HomeFragment";
     private static final boolean DEBUG = AppLogger.DEBUG;
-
-    private DrawerLayout mDrawerLayout;
-    private ActionBarDrawerToggle mDrawerToggle;
 
     private ListView mListView;
     private SnapshotsAdapter mAdapter;
@@ -112,18 +105,6 @@ public class SnapshotsListFragment extends Fragment {
 
         View rootView = getView();
 
-
-        mDrawerLayout = (DrawerLayout) rootView.findViewById(R.id.drawer_layout);
-        mDrawerToggle = new ActionBarDrawerToggle(getActivity(), mDrawerLayout,
-                R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close);
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-        getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
-
-        // Sync the toggle state after onRestoreInstanceState has occurred.
-        // The following line must be called, otherwise the provided drawer image will be used.
-        mDrawerToggle.syncState();
-
         mListView = (ListView) rootView.findViewById(R.id.snapshot_list);
         mListView.setEmptyView(rootView.findViewById(R.id.snapshot_empty_view));
         mAdapter = new SnapshotsAdapter(getActivity(), mListView);
@@ -135,27 +116,7 @@ public class SnapshotsListFragment extends Fragment {
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        mDrawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.main_menu, menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        /*
-         * The action bar home/up action should open or close the drawer.
-         * mDrawerToggle will take care of this.
-         */
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-
         switch (item.getItemId()) {
             case R.id.add:
                 addTrafficStatsSnapshot();

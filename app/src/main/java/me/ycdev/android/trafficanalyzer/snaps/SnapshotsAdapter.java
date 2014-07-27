@@ -1,10 +1,9 @@
-package me.ycdev.android.trafficanalyzer;
+package me.ycdev.android.trafficanalyzer.snaps;
 
 import java.util.Collections;
 import java.util.List;
 
 import me.ycdev.android.trafficanalyzer.R;
-import me.ycdev.android.trafficanalyzer.stats.StatsSnapshot;
 
 import android.content.Context;
 import android.view.LayoutInflater;

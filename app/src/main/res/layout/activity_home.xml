@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/frag_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/drawer"
+        android:layout_width="260dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="left"
+        android:background="@color/drawer_bkg"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/snapshots"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:paddingLeft="10dp"
+            android:gravity="left|center_vertical"
+            android:background="@drawable/drawer_item_bkg"
+            android:text="@string/drawer_snapshots" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/drawer_divider_line" />
+
+        <TextView
+            android:id="@+id/profiles"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:paddingLeft="10dp"
+            android:gravity="left|center_vertical"
+            android:background="@drawable/drawer_item_bkg"
+            android:text="@string/drawer_profiles" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/drawer_divider_line" />
+
+    </LinearLayout>
+</android.support.v4.widget.DrawerLayout>
